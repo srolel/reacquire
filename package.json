@@ -1,6 +1,6 @@
 {
   "name": "reacquire",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reload node modules",
   "directories": {
     "test": "test"
