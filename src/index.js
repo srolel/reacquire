@@ -91,6 +91,7 @@ const factory = (module, defaultOpts = {}) => {
                 uncache(moduleName);
                 return safeRequire();
             }, throttle, {trailing: false});
+
         if (watch) {
             // whether to watch node_modules
             const modules = watchModules 
@@ -142,7 +143,12 @@ const validate = {
 
 const verifyInput = (options) => {
     if (validate.options(options) === false ) {
-        throw new TypeError('second argument should be an object if provided');
+        const type = typeof options;
+        let msg = 'Argument should be an object if provided, instead saw `' + type + '`.';
+        if (type === 'string') {
+            msg += ' Did you call the required module before trying to import? `var reacquire = require(\'reacquire\')()`';
+        }
+        throw new TypeError(msg);
     }
 }
 

@@ -2,7 +2,6 @@
   "name": "reacquire",
   "version": "0.1.0",
   "description": "Reload node modules",
-  "main": "build/index.js",
   "directories": {
     "test": "test"
   },
