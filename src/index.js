@@ -11,7 +11,7 @@ const unwatch = () => {
     }
 };
 
-const factory = (module, defaultOpts = {}) => {
+const factory = (_module, defaultOpts = {}) => {
 
     /**
      * Runs over the cache to search for all the cached
@@ -20,11 +20,11 @@ const factory = (module, defaultOpts = {}) => {
 
     const searchCache = (moduleName, callback) => {
         // Resolve the module identified by the specified name
-        var mod = module.constructor._resolveFilename(moduleName, module);
+        var mod = _module.constructor._resolveFilename(moduleName, _module);
 
         // Check if the module has been resolved and found within
         // the cache
-        if (mod && ((mod = module.constructor._cache[mod]) !== undefined)) {
+        if (mod && ((mod = _module.constructor._cache[mod]) !== undefined)) {
             // Recursively go over the results
             (function run(mod) {
                 // Go over each of the module's children and
@@ -46,12 +46,12 @@ const factory = (module, defaultOpts = {}) => {
         // Run over the cache looking for the files
         // loaded by the specified module name
         searchCache(moduleName, (mod) =>
-            delete module.constructor._cache[mod.id]);
+            delete _module.constructor._cache[mod.id]);
 
         // Remove cached paths to the module.
-        Object.keys(module.constructor._pathCache).forEach(cacheKey => {
+        Object.keys(_module.constructor._pathCache).forEach(cacheKey => {
             if (cacheKey.indexOf(moduleName) > 0) {
-                delete module.constructor._pathCache[cacheKey];
+                delete _module.constructor._pathCache[cacheKey];
             }
         });
     };
@@ -76,7 +76,7 @@ const factory = (module, defaultOpts = {}) => {
 
         const safeRequire = () => {
             try {
-                module.require(moduleName);
+                _module.require(moduleName);
             } catch(e) {
                 console.error(e.stack || e);
             }
@@ -152,7 +152,8 @@ const verifyInput = (options) => {
     }
 }
 
-module.exports = (opts = {}) => {
+// _module should be the module that required the reacquire package.
+module.exports = function(opts = {}) {
 
     verifyInput(opts);
 
@@ -165,7 +166,11 @@ module.exports = (opts = {}) => {
     } else {
         // create a new require function and return it
         opts = assign({}, defaultOpts.noRegister, opts);
-        return factory(module.parent, opts);
+        // optional binding of module, because we depend on the hierarchy
+        // and this module is imported and exported from {root}/index.js.
+        // there's probably a better way to do this.
+        const parentModule = (this && this.parent) || module.parent;
+        return factory(parentModule, opts);
     }
 }
 
