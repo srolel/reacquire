@@ -20,7 +20,7 @@ This package watches imported modules and reruns them (and their dependencies), 
 
 ## Installation
 
-`npm install reacquire`
+`npm i reacquire`
 
 ## API Reference
 
